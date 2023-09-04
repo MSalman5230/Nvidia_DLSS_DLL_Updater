@@ -53,3 +53,17 @@ def download_dll_zip(url, id, file_name):
     else:
         print(f"Failed to download the file. Status code: {response.status_code}")
         exit()
+    
+def extract_zip_file(zip_file_name):
+    try:
+        print(f"Extracting {zip_file_name}")
+        # Open the specified zip file
+        with zipfile.ZipFile(zip_file_name, "r") as zip_ref:
+            # Extract all the contents to the root location (current working directory)
+            zip_ref.extractall("")
+
+        print(f"Successfully extracted '{zip_file_name}' to root location")
+    except zipfile.BadZipFile as e:
+        print(f"Error: {e}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
