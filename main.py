@@ -32,6 +32,7 @@ def get_file_id(url):
         print(f"Failed to scrape {url}:{e}")
         exit()
 
+
 def check_if_zip_exists(file_name):
     if os.path.exists(file_name):
         print(f"The file at '{file_name}' exists.")
@@ -49,11 +50,13 @@ def download_dll_zip(url, id, file_name):
         with open(file_name, "wb") as file:
             file.write(response.content)
             print(f"{file_name} successfully downloaded")
+            return file_name
 
     else:
         print(f"Failed to download the file. Status code: {response.status_code}")
         exit()
-    
+
+
 def extract_zip_file(zip_file_name):
     try:
         print(f"Extracting {zip_file_name}")
@@ -68,6 +71,16 @@ def extract_zip_file(zip_file_name):
     except Exception as e:
         print(f"An error occurred: {e}")
 
+
+def check_DLL_exists_in_root(DLSS_FG_Game_exists):
+    if not os.path.exists("nvngx_dlss.dll"):
+        print("nvngx_dlss.dll not found in root location \nexiting..")
+        exit()
+    if DLSS_FG_Game_exists and not os.path.exists("nvngx_dlssg.dll"):
+        print("nvngx_dlssg.dll not found in root location \nexiting..")
+        exit()
+
+
 def find_dll_files(game_paths_list):
     dll_files = []
     DLSS_FG_Game = False
@@ -81,6 +94,7 @@ def find_dll_files(game_paths_list):
                         DLSS_FG_Game = True
 
     return dll_files, DLSS_FG_Game
+
 
 def move_new_dll(file_path):
     try:
@@ -114,3 +128,49 @@ def rename_old_DLLs(dll_files_paths):
                 print(f"File '{file_path}' does not exist")
         except Exception as e:
             print(f"Failed to rename {file_path}:{e}")
+
+
+if __name__ == "__main__":
+    # Find All the DLLs in game path
+    print(f"Finding path for nvngx_dlssg.dll and nvngx_dlss.dll in {game_paths_list}")
+    dll_files_paths, DLSS_FG_Game_exists = find_dll_files(game_paths_list)
+    if len(dll_files_paths) == 0:
+        print("No Games found with nvngx_dlssg.dll or nvngx_dlss.dll \n Exiting..")
+        exit()
+
+    print(dll_files_paths)
+
+    # Check if DLL Download is needed
+    DLSS_ZIP_Location = os.environ.get("DLSS_ZIP")
+    DLSS_FG_ZIP_Location = os.environ.get("DLSS_FG_ZIP")
+
+    # Download DLSS zip if not present
+    if DLSS_ZIP_Location is None and check_if_zip_exists(DLSS_ZIP_Location):
+        url = urls["DLSS"]
+        id, file_name = get_file_id(url)
+        DLSS_ZIP_Location = download_dll_zip(url, id, file_name)
+
+    # Download DLSS Frame Gen zip if not present
+    if DLSS_FG_ZIP_Location is None and check_if_zip_exists(DLSS_FG_ZIP_Location):
+        if DLSS_FG_Game_exists:
+            url = urls["DLSS_FG"]
+            id, file_name = get_file_id(url)
+            DLSS_FG_ZIP_Location = download_dll_zip(url, id, file_name)
+        else:
+            print("Skipping download of Frame Generation DLL as there is no game with Frame Generation")
+
+    # Extract Downloaded File
+    extract_zip_file(DLSS_ZIP_Location)
+
+    if DLSS_FG_Game_exists:
+        extract_zip_file(DLSS_FG_ZIP_Location)
+
+    # check if the extraction was in correct
+    check_DLL_exists_in_root(DLSS_FG_Game_exists)
+    # Create Back of Old DLLs
+    rename_old_DLLs(dll_files_paths)
+
+    # Move new DLLs
+    move_new_dll(dll_files_paths)
+
+    pass
