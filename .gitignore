@@ -1,3 +1,9 @@
+nvngx_dlss_3.5.0.zip
+nvngx_dlssg_3.5.0.zip
+nvngx_dlss.dll
+nvngx_dlssg.dll
+test.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -143,6 +149,7 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
 
 # PyCharm
 #  JetBrains specific template is maintainted in a separate JetBrains.gitignore that can
