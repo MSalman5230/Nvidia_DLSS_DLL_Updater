@@ -4,16 +4,21 @@ import os
 import time
 from bs4 import BeautifulSoup
 import zipfile
-from dotenv import load_dotenv
+from dotenv import dotenv_values
 import datetime
 import re
 
-load_dotenv()
-game_paths_list = os.environ.get("GAME_PATH")
+CONFIG = dotenv_values("config.txt")
+game_paths_list = CONFIG["GAME_PATH"]
 game_paths_list = [path.strip() for path in game_paths_list.split(",")]
 game_paths_list = [path for path in game_paths_list if path]
 # print(game_paths_list)
-TPU_DOWNLOAD_SERVER_ID = 14
+if 'TPU_DOWNLOAD_SERVER_ID' in CONFIG and CONFIG['TPU_DOWNLOAD_SERVER_ID'].strip():
+    TPU_DOWNLOAD_SERVER_ID = int(CONFIG['TPU_DOWNLOAD_SERVER_ID'])
+else:
+    TPU_DOWNLOAD_SERVER_ID = 14
+
+print("TPU_DOWNLOAD_SERVER_ID:",TPU_DOWNLOAD_SERVER_ID)
 urls = {"DLSS": "https://www.techpowerup.com/download/nvidia-dlss-dll/", "DLSS_FG": "https://www.techpowerup.com/download/nvidia-dlss-3-frame-generation-dll/"}
 
 
@@ -60,6 +65,7 @@ def download_dll_zip(url, id, file_name):
 
     else:
         print(f"Failed to download the file. Status code: {response.status_code}")
+        print("Check TPU_DOWNLOAD_SERVER_ID in config.txt")
         exit()
 
 
@@ -129,7 +135,7 @@ def rename_old_DLLs(dll_files_paths):
                 new_file_path = os.path.join(directory, new_filename)
                 # Rename the file in place
                 os.rename(file_path, new_file_path)
-                print(f"Renamed '{filename}' to '{new_filename}' in place")
+                print(f"Renamed '{file_path}' to '{new_file_path}' in place")
                 copy_new_dll(file_path)
             else:
                 print(f"File '{file_path}' does not exist")
@@ -149,30 +155,33 @@ if __name__ == "__main__":
 
     # print(f"Check if DLL Zip location provided")
     # Check if DLL Download is needed
-    DLSS_ZIP_Location = os.environ.get("DLSS_ZIP")
-    DLSS_FG_ZIP_Location = os.environ.get("DLSS_FG_ZIP")
-    # print(" --------",DLSS_ZIP_Location,"-----",type(DLSS_ZIP_Location))
+    DLSS_ZIP_Name = CONFIG["DLSS_ZIP_NAME"]
+    DLSS_FG_ZIP_Name = CONFIG["DLSS_FG_ZIP_NAME"]
+    # print(" --------",DLSS_ZIP_Name,"-----",type(DLSS_ZIP_Name))
     # Download DLSS zip if not present
 
-    if not check_if_zip_exists(DLSS_ZIP_Location) and is_empty_or_whitespace(DLSS_ZIP_Location):
+    if not check_if_zip_exists(DLSS_ZIP_Name) and is_empty_or_whitespace(DLSS_ZIP_Name):
         url = urls["DLSS"]
         id, file_name = get_file_id(url)
-        DLSS_ZIP_Location = download_dll_zip(url, id, file_name)
-
+        DLSS_ZIP_Name = download_dll_zip(url, id, file_name)
+    else:
+        print(f"Manual placement of {DLSS_ZIP_Name} found")
     # Download DLSS Frame Gen zip if not present
-    if not check_if_zip_exists(DLSS_FG_ZIP_Location) and is_empty_or_whitespace(DLSS_FG_ZIP_Location):
+    if not check_if_zip_exists(DLSS_FG_ZIP_Name) and is_empty_or_whitespace(DLSS_FG_ZIP_Name):
         if DLSS_FG_Game_exists:
             url = urls["DLSS_FG"]
             id, file_name = get_file_id(url)
-            DLSS_FG_ZIP_Location = download_dll_zip(url, id, file_name)
+            DLSS_FG_ZIP_Name = download_dll_zip(url, id, file_name)
         else:
             print("Skipping download of Frame Generation DLL as there is no game with Frame Generation")
+    else:
+        print(f"Manual placement of {DLSS_FG_ZIP_Name} found")
 
     # Extract Downloaded File
-    extract_zip_file(DLSS_ZIP_Location)
+    extract_zip_file(DLSS_ZIP_Name)
 
     if DLSS_FG_Game_exists:
-        extract_zip_file(DLSS_FG_ZIP_Location)
+        extract_zip_file(DLSS_FG_ZIP_Name)
 
     # check if the extraction was in correct
     check_DLL_exists_in_root(DLSS_FG_Game_exists)
