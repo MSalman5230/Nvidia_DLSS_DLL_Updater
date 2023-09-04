@@ -6,19 +6,25 @@ from bs4 import BeautifulSoup
 import zipfile
 from dotenv import load_dotenv
 import datetime
+import re
 
 load_dotenv()
 game_paths_list = os.environ.get("GAME_PATH")
 game_paths_list = [path.strip() for path in game_paths_list.split(",")]
 game_paths_list = [path for path in game_paths_list if path]
-print(game_paths_list)
+# print(game_paths_list)
 TPU_DOWNLOAD_SERVER_ID = 14
 urls = {"DLSS": "https://www.techpowerup.com/download/nvidia-dlss-dll/", "DLSS_FG": "https://www.techpowerup.com/download/nvidia-dlss-3-frame-generation-dll/"}
 
 
+def is_empty_or_whitespace(input_string):
+    if input_string is None:
+        return True
+    return re.match(r"^\s*$", input_string) is not None
+
+
 def get_file_id(url):
     try:
-        url = "https://www.techpowerup.com/download/nvidia-dlss-dll/"
         response = requests.get(url).text
         soup = BeautifulSoup(response, "lxml")
 
@@ -35,10 +41,10 @@ def get_file_id(url):
 
 def check_if_zip_exists(file_name):
     if os.path.exists(file_name):
-        print(f"The file at '{file_name}' exists.")
+        # print(f"The file at '{file_name}' exists.")
         return True
 
-    print(f"The file at '{file_name}' does not exist.")
+    # print(f"The file at '{file_name}' does not exist.")
     return False
 
 
@@ -96,15 +102,16 @@ def find_dll_files(game_paths_list):
     return dll_files, DLSS_FG_Game
 
 
-def move_new_dll(file_path):
+def copy_new_dll(file_path):
+    directory, filename = os.path.split(file_path)
     try:
         # directory_path = os.path.dirname(directory)
-        directory, filename = os.path.split(file_path)
+        # directory, filename = os.path.split(file_path)
         # Move the file from the source to the destination
-        shutil.move(filename, directory)
-        print(f"Moved {filename} to {directory}")
+        shutil.copy(filename, directory)
+        print(f"Copied {filename} to {directory}")
     except Exception as e:
-        print(f"Failed to move {filename} to {directory} :{e}")
+        print(f"Failed to copy {filename} to {directory} :{e}")
 
 
 def rename_old_DLLs(dll_files_paths):
@@ -123,7 +130,7 @@ def rename_old_DLLs(dll_files_paths):
                 # Rename the file in place
                 os.rename(file_path, new_file_path)
                 print(f"Renamed '{filename}' to '{new_filename}' in place")
-                move_new_dll(file_path)
+                copy_new_dll(file_path)
             else:
                 print(f"File '{file_path}' does not exist")
         except Exception as e:
@@ -138,20 +145,22 @@ if __name__ == "__main__":
         print("No Games found with nvngx_dlssg.dll or nvngx_dlss.dll \n Exiting..")
         exit()
 
-    print(dll_files_paths)
+    print(f"Found {dll_files_paths}")
 
+    # print(f"Check if DLL Zip location provided")
     # Check if DLL Download is needed
     DLSS_ZIP_Location = os.environ.get("DLSS_ZIP")
     DLSS_FG_ZIP_Location = os.environ.get("DLSS_FG_ZIP")
-
+    # print(" --------",DLSS_ZIP_Location,"-----",type(DLSS_ZIP_Location))
     # Download DLSS zip if not present
-    if DLSS_ZIP_Location is None and check_if_zip_exists(DLSS_ZIP_Location):
+
+    if not check_if_zip_exists(DLSS_ZIP_Location) and is_empty_or_whitespace(DLSS_ZIP_Location):
         url = urls["DLSS"]
         id, file_name = get_file_id(url)
         DLSS_ZIP_Location = download_dll_zip(url, id, file_name)
 
     # Download DLSS Frame Gen zip if not present
-    if DLSS_FG_ZIP_Location is None and check_if_zip_exists(DLSS_FG_ZIP_Location):
+    if not check_if_zip_exists(DLSS_FG_ZIP_Location) and is_empty_or_whitespace(DLSS_FG_ZIP_Location):
         if DLSS_FG_Game_exists:
             url = urls["DLSS_FG"]
             id, file_name = get_file_id(url)
@@ -167,10 +176,9 @@ if __name__ == "__main__":
 
     # check if the extraction was in correct
     check_DLL_exists_in_root(DLSS_FG_Game_exists)
-    # Create Back of Old DLLs
+    # Create Back of Old DLLs and Copy New
     rename_old_DLLs(dll_files_paths)
 
-    # Move new DLLs
-    move_new_dll(dll_files_paths)
+    print("Done")
 
     pass
