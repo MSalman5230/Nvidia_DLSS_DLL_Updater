@@ -31,3 +31,25 @@ def get_file_id(url):
     except Exception as e:
         print(f"Failed to scrape {url}:{e}")
         exit()
+
+def check_if_zip_exists(file_name):
+    if os.path.exists(file_name):
+        print(f"The file at '{file_name}' exists.")
+        return True
+
+    print(f"The file at '{file_name}' does not exist.")
+    return False
+
+
+def download_dll_zip(url, id, file_name):
+    payload = {"server_id": TPU_DOWNLOAD_SERVER_ID, "id": id}
+    print(f"Downloading {file_name} ......")
+    response = requests.request("POST", url, data=payload)
+    if response.status_code == 200:
+        with open(file_name, "wb") as file:
+            file.write(response.content)
+            print(f"{file_name} successfully downloaded")
+
+    else:
+        print(f"Failed to download the file. Status code: {response.status_code}")
+        exit()
