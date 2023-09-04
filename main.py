@@ -91,3 +91,26 @@ def move_new_dll(file_path):
         print(f"Moved {filename} to {directory}")
     except Exception as e:
         print(f"Failed to move {filename} to {directory} :{e}")
+
+
+def rename_old_DLLs(dll_files_paths):
+    # Get the current date and time
+    current_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+    # Iterate through the file paths and rename the files in place
+    for file_path in dll_files_paths:
+        try:
+            if os.path.exists(file_path):
+                directory, filename = os.path.split(file_path)
+                base_filename, extension = os.path.splitext(filename)
+                # new_filename = f"{base_filename}_Backup_{current_date}{extension}"
+                new_filename = f"{filename}_Backup_{current_date}"
+                new_file_path = os.path.join(directory, new_filename)
+                # Rename the file in place
+                os.rename(file_path, new_file_path)
+                print(f"Renamed '{filename}' to '{new_filename}' in place")
+                move_new_dll(file_path)
+            else:
+                print(f"File '{file_path}' does not exist")
+        except Exception as e:
+            print(f"Failed to rename {file_path}:{e}")
