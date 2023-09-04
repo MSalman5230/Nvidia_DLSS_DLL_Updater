@@ -67,3 +67,17 @@ def extract_zip_file(zip_file_name):
         print(f"Error: {e}")
     except Exception as e:
         print(f"An error occurred: {e}")
+
+def find_dll_files(game_paths_list):
+    dll_files = []
+    DLSS_FG_Game = False
+    for directory in game_paths_list:
+        for root, dirs, files in os.walk(directory):
+            for filename in files:
+                if filename in ["nvngx_dlss.dll", "nvngx_dlssg.dll"]:
+                    file_path = os.path.join(root, filename)
+                    dll_files.append(file_path)
+                    if filename == "nvngx_dlssg.dll":
+                        DLSS_FG_Game = True
+
+    return dll_files, DLSS_FG_Game
