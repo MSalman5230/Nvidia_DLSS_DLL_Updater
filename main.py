@@ -81,3 +81,13 @@ def find_dll_files(game_paths_list):
                         DLSS_FG_Game = True
 
     return dll_files, DLSS_FG_Game
+
+def move_new_dll(file_path):
+    try:
+        # directory_path = os.path.dirname(directory)
+        directory, filename = os.path.split(file_path)
+        # Move the file from the source to the destination
+        shutil.move(filename, directory)
+        print(f"Moved {filename} to {directory}")
+    except Exception as e:
+        print(f"Failed to move {filename} to {directory} :{e}")
