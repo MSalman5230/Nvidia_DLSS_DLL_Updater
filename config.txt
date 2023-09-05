@@ -1,4 +1,8 @@
+# Techpowerup
 TPU_DOWNLOAD_SERVER_ID=14
-GAME_PATH=E:\ROMs
-DLSS_ZIP_NAME=nvngx_dlss_3.5.0.zip
-DLSS_FG_ZIP_NAME=nvngx_dlssg_3.5.0.zip
+DLSS_URL=https://www.techpowerup.com/download/nvidia-dlss-dll/
+DLSS_FG_URL=https://www.techpowerup.com/download/nvidia-dlss-3-frame-generation-dll/
+
+# User Setup
+GAME_PATH=E:\ROMs # Change
+

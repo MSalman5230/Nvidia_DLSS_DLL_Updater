@@ -8,18 +8,31 @@ from dotenv import dotenv_values
 import datetime
 import re
 
+
+def exit_program():
+    print("Press any key to exit...")
+    input()
+    exit()
+
+
 CONFIG = dotenv_values("config.txt")
+if len(CONFIG) == 0:
+    print("config.txt not found")
+    exit_program()
+
 game_paths_list = CONFIG["GAME_PATH"]
 game_paths_list = [path.strip() for path in game_paths_list.split(",")]
 game_paths_list = [path for path in game_paths_list if path]
 # print(game_paths_list)
-if 'TPU_DOWNLOAD_SERVER_ID' in CONFIG and CONFIG['TPU_DOWNLOAD_SERVER_ID'].strip():
-    TPU_DOWNLOAD_SERVER_ID = int(CONFIG['TPU_DOWNLOAD_SERVER_ID'])
+if "TPU_DOWNLOAD_SERVER_ID" in CONFIG and CONFIG["TPU_DOWNLOAD_SERVER_ID"].strip():
+    TPU_DOWNLOAD_SERVER_ID = int(CONFIG["TPU_DOWNLOAD_SERVER_ID"])
 else:
     TPU_DOWNLOAD_SERVER_ID = 14
 
-print("TPU_DOWNLOAD_SERVER_ID:",TPU_DOWNLOAD_SERVER_ID)
-urls = {"DLSS": "https://www.techpowerup.com/download/nvidia-dlss-dll/", "DLSS_FG": "https://www.techpowerup.com/download/nvidia-dlss-3-frame-generation-dll/"}
+print("TPU_DOWNLOAD_SERVER_ID:", TPU_DOWNLOAD_SERVER_ID)
+DLSS_URL=CONFIG["DLSS_URL"]
+DLSS_FG_URL=CONFIG["DLSS_FG_URL"]
+#urls = {"DLSS": "https://www.techpowerup.com/download/nvidia-dlss-dll/", "DLSS_FG": "https://www.techpowerup.com/download/nvidia-dlss-3-frame-generation-dll/"}
 
 
 def is_empty_or_whitespace(input_string):
@@ -41,7 +54,7 @@ def get_file_id(url):
         return id, file_name
     except Exception as e:
         print(f"Failed to scrape {url}:{e}")
-        exit()
+        exit_program()
 
 
 def check_if_zip_exists(file_name):
@@ -66,7 +79,7 @@ def download_dll_zip(url, id, file_name):
     else:
         print(f"Failed to download the file. Status code: {response.status_code}")
         print("Check TPU_DOWNLOAD_SERVER_ID in config.txt")
-        exit()
+        exit_program()
 
 
 def extract_zip_file(zip_file_name):
@@ -87,10 +100,10 @@ def extract_zip_file(zip_file_name):
 def check_DLL_exists_in_root(DLSS_FG_Game_exists):
     if not os.path.exists("nvngx_dlss.dll"):
         print("nvngx_dlss.dll not found in root location \nexiting..")
-        exit()
+        exit_program()
     if DLSS_FG_Game_exists and not os.path.exists("nvngx_dlssg.dll"):
         print("nvngx_dlssg.dll not found in root location \nexiting..")
-        exit()
+        exit_program()
 
 
 def find_dll_files(game_paths_list):
@@ -149,7 +162,7 @@ if __name__ == "__main__":
     dll_files_paths, DLSS_FG_Game_exists = find_dll_files(game_paths_list)
     if len(dll_files_paths) == 0:
         print("No Games found with nvngx_dlssg.dll or nvngx_dlss.dll \n Exiting..")
-        exit()
+        exit_program()
 
     print(f"Found {dll_files_paths}")
 
@@ -165,7 +178,7 @@ if __name__ == "__main__":
         id, file_name = get_file_id(url)
         DLSS_ZIP_Name = download_dll_zip(url, id, file_name)
     else:
-        print(f"Manual placement of {DLSS_ZIP_Name} found")
+        print(f"Manual placement of {DLSS_ZIP_Name} found in config.txt")
     # Download DLSS Frame Gen zip if not present
     if not check_if_zip_exists(DLSS_FG_ZIP_Name) and is_empty_or_whitespace(DLSS_FG_ZIP_Name):
         if DLSS_FG_Game_exists:
@@ -175,7 +188,7 @@ if __name__ == "__main__":
         else:
             print("Skipping download of Frame Generation DLL as there is no game with Frame Generation")
     else:
-        print(f"Manual placement of {DLSS_FG_ZIP_Name} found")
+        print(f"Manual placement of {DLSS_FG_ZIP_Name} found in config.txt")
 
     # Extract Downloaded File
     extract_zip_file(DLSS_ZIP_Name)
@@ -190,4 +203,4 @@ if __name__ == "__main__":
 
     print("Done")
 
-    pass
+    exit_program()
