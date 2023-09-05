@@ -24,3 +24,5 @@ GAME_PATH=E:\Games # Change to your Game Library, Can take multiple path with co
 DLSS_ZIP_NAME=nvngx_dlss_3.5.0.zip # if want to download from link Techpowerup leave it blank or remove it
 DLSS_FG_ZIP_NAME=nvngx_dlssg_3.5.0.zip # if want to download from link Techpowerup leave it blank or remove it
 ```
+\
+If you like my work, Star this repository, Thank you
