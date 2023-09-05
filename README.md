@@ -10,6 +10,7 @@ Then finds all the **nvngx_dlss.dll** and **nvngx_dlssg.dl** in your local game 
 Download the latest build from release and extract
 In **config.txt** change the config according to your need
 ```bash
+# **config.txt**
 # TechPowerUp Dont Change if you dont know
 TPU_DOWNLOAD_SERVER_ID=14 # SERVER_ID is the server location of TechPowerUp, 15=SG,14=NL,5=UK,3=USA-2
 DLSS_URL=https://www.techpowerup.com/download/nvidia-dlss-dll/
