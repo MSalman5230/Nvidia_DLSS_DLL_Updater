@@ -1,0 +1,14 @@
+altgraph==0.17.3
+beautifulsoup4==4.12.2
+certifi==2023.7.22
+charset-normalizer==3.2.0
+idna==3.4
+lxml==4.9.3
+pefile==2023.2.7
+pyinstaller==5.13.2
+pyinstaller-hooks-contrib==2023.8
+python-dotenv==1.0.0
+pywin32-ctypes==0.2.2
+requests==2.31.0
+soupsieve==2.5
+urllib3==2.0.4
