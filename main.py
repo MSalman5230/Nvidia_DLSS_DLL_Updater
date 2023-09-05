@@ -15,30 +15,53 @@ def exit_program():
     exit()
 
 
+def is_empty_or_whitespace(input_string):
+    if input_string is None:
+        return True
+    return re.match(r"^\s*$", input_string) is not None
+
+
 CONFIG = dotenv_values("config.txt")
 if len(CONFIG) == 0:
     print("config.txt not found")
     exit_program()
 
-game_paths_list = CONFIG["GAME_PATH"]
-game_paths_list = [path.strip() for path in game_paths_list.split(",")]
-game_paths_list = [path for path in game_paths_list if path]
-# print(game_paths_list)
-if "TPU_DOWNLOAD_SERVER_ID" in CONFIG and CONFIG["TPU_DOWNLOAD_SERVER_ID"].strip():
+try:
+    game_paths_list = CONFIG["GAME_PATH"]
+    game_paths_list = [path.strip() for path in game_paths_list.split(",")]
+    game_paths_list = [path for path in game_paths_list if path]
+
+    # print(game_paths_list)
+    TPU_DOWNLOAD_SERVER_ID = (CONFIG["TPU_DOWNLOAD_SERVER_ID"])
+    DLSS_URL = CONFIG["DLSS_URL"]
+    DLSS_FG_URL = CONFIG["DLSS_FG_URL"]
+
+    if is_empty_or_whitespace(TPU_DOWNLOAD_SERVER_ID):
+        print("TPU_DOWNLOAD_SERVER_ID is missing in config.txt")
+        exit_program()
+    if is_empty_or_whitespace(DLSS_URL):
+        print("DLSS_URL is missing in config.txt")
+        exit_program()
+    if is_empty_or_whitespace(DLSS_FG_URL):
+        print("DLSS_FG_URL is missing in config.txt")
+        exit_program()
+    if len(game_paths_list) == 0:
+        print("GAME_PATH is missing in config.txt")
+        exit_program()
+except Exception as e:
+    print("Necessary variable missing from config.txt")
+    print("Necessary variable in config.txt \nTPU_DOWNLOAD_SERVER_ID\nDLSS_URL\nDLSS_FG_URL\nGAME_PATH")
+    exit_program()
+
+"""if "TPU_DOWNLOAD_SERVER_ID" in CONFIG and CONFIG["TPU_DOWNLOAD_SERVER_ID"].strip():
     TPU_DOWNLOAD_SERVER_ID = int(CONFIG["TPU_DOWNLOAD_SERVER_ID"])
 else:
     TPU_DOWNLOAD_SERVER_ID = 14
 
 print("TPU_DOWNLOAD_SERVER_ID:", TPU_DOWNLOAD_SERVER_ID)
 DLSS_URL=CONFIG["DLSS_URL"]
-DLSS_FG_URL=CONFIG["DLSS_FG_URL"]
-#urls = {"DLSS": "https://www.techpowerup.com/download/nvidia-dlss-dll/", "DLSS_FG": "https://www.techpowerup.com/download/nvidia-dlss-3-frame-generation-dll/"}
-
-
-def is_empty_or_whitespace(input_string):
-    if input_string is None:
-        return True
-    return re.match(r"^\s*$", input_string) is not None
+DLSS_FG_URL=CONFIG["DLSS_FG_URL"]"""
+# urls = {"DLSS": "https://www.techpowerup.com/download/nvidia-dlss-dll/", "DLSS_FG": "https://www.techpowerup.com/download/nvidia-dlss-3-frame-generation-dll/"}
 
 
 def get_file_id(url):
@@ -168,27 +191,32 @@ if __name__ == "__main__":
 
     # print(f"Check if DLL Zip location provided")
     # Check if DLL Download is needed
-    DLSS_ZIP_Name = CONFIG["DLSS_ZIP_NAME"]
-    DLSS_FG_ZIP_Name = CONFIG["DLSS_FG_ZIP_NAME"]
-    # print(" --------",DLSS_ZIP_Name,"-----",type(DLSS_ZIP_Name))
+    if "DLSS_ZIP_NAME" in CONFIG:
+        DLSS_ZIP_Name = CONFIG["DLSS_ZIP_NAME"]
+    else:
+        DLSS_ZIP_Name = ""
+    if "DLSS_FG_ZIP_Name" in CONFIG:
+        DLSS_FG_ZIP_Name = CONFIG["DLSS_FG_ZIP_Name"]
+    else:
+        DLSS_FG_ZIP_Name = ""
+    
     # Download DLSS zip if not present
-
-    if not check_if_zip_exists(DLSS_ZIP_Name) and is_empty_or_whitespace(DLSS_ZIP_Name):
-        url = urls["DLSS"]
+    if not check_if_zip_exists(DLSS_ZIP_Name) and is_empty_or_whitespace(DLSS_ZIP_Name) :
+        url = DLSS_URL
         id, file_name = get_file_id(url)
         DLSS_ZIP_Name = download_dll_zip(url, id, file_name)
     else:
-        print(f"Manual placement of {DLSS_ZIP_Name} found in config.txt")
+        print(f"Using {DLSS_ZIP_Name} as configured in config.txt")
     # Download DLSS Frame Gen zip if not present
     if not check_if_zip_exists(DLSS_FG_ZIP_Name) and is_empty_or_whitespace(DLSS_FG_ZIP_Name):
         if DLSS_FG_Game_exists:
-            url = urls["DLSS_FG"]
+            url = DLSS_FG_URL
             id, file_name = get_file_id(url)
             DLSS_FG_ZIP_Name = download_dll_zip(url, id, file_name)
         else:
             print("Skipping download of Frame Generation DLL as there is no game with Frame Generation")
     else:
-        print(f"Manual placement of {DLSS_FG_ZIP_Name} found in config.txt")
+        print(f"Using {DLSS_FG_ZIP_Name} as configured in config.txt")
 
     # Extract Downloaded File
     extract_zip_file(DLSS_ZIP_Name)
