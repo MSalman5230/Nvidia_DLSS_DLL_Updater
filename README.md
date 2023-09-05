@@ -18,6 +18,8 @@ DLSS_FG_URL=https://www.techpowerup.com/download/nvidia-dlss-3-frame-generation-
 
 # User Setup
 GAME_PATH=E:\Games # Change to your Game Library
+
+# FI you dont want to download or already downloaded manually then place the zip file in the same location of exe, and put name of the zip here
 DLSS_ZIP_NAME=nvngx_dlss_3.5.0.zip # if want to download from link Techpowerup leave it blank or remove it
 DLSS_FG_ZIP_NAME=nvngx_dlssg_3.5.0.zip # if want to download from link Techpowerup leave it blank or remove it
 ```
