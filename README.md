@@ -2,7 +2,7 @@
 
 Game Developers/Studio often do not update nvidia DLSS dll, However Nvidia constantly updates DLSS dll for better Image Quality/Stability
 
-1. This program downs newest DLLs from TechPowerUp.com .
+1. This program downloads newest DLLs from TechPowerUp.com .
 2. Finds all the DLSS: **nvngx_dlss.dll** and DLSS Frame Gen: **nvngx_dlssg.dl** in your local game paths provided in config.txt.
 3. Makes Backup of old DLLs for safe keeping in the same directory, nvngx_dlss.dll will be renamed to nvngx_dlss.dll_Backup_2023-09-05_05-25-22.
 4. Copies the new DLL downloaded from TechPowerUp.com.
