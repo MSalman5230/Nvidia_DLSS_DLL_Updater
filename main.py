@@ -32,7 +32,7 @@ try:
     game_paths_list = [path for path in game_paths_list if path]
 
     # print(game_paths_list)
-    TPU_DOWNLOAD_SERVER_ID = (CONFIG["TPU_DOWNLOAD_SERVER_ID"])
+    TPU_DOWNLOAD_SERVER_ID = CONFIG["TPU_DOWNLOAD_SERVER_ID"]
     DLSS_URL = CONFIG["DLSS_URL"]
     DLSS_FG_URL = CONFIG["DLSS_FG_URL"]
 
@@ -152,9 +152,9 @@ def copy_new_dll(file_path):
         # directory, filename = os.path.split(file_path)
         # Move the file from the source to the destination
         shutil.copy(filename, directory)
-        print(f"Copied {filename} to {directory}")
+        print(f"Copied {filename} to {directory}\n")
     except Exception as e:
-        print(f"Failed to copy {filename} to {directory} :{e}")
+        print(f"Failed to copy {filename} to {directory} :{e}\n")
 
 
 def rename_old_DLLs(dll_files_paths):
@@ -172,12 +172,12 @@ def rename_old_DLLs(dll_files_paths):
                 new_file_path = os.path.join(directory, new_filename)
                 # Rename the file in place
                 os.rename(file_path, new_file_path)
-                print(f"Renamed '{file_path}' to '{new_file_path}' in place")
+                print(f"Renamed '{file_path}' to '{new_file_path}' in place\n")
                 copy_new_dll(file_path)
             else:
-                print(f"File '{file_path}' does not exist")
+                print(f"File '{file_path}' does not exist\n")
         except Exception as e:
-            print(f"Failed to rename {file_path}:{e}")
+            print(f"Failed to rename {file_path}:{e}\n")
 
 
 if __name__ == "__main__":
@@ -188,8 +188,15 @@ if __name__ == "__main__":
         print("No Games found with nvngx_dlssg.dll or nvngx_dlss.dll \n Exiting..")
         exit_program()
 
-    print(f"Found {dll_files_paths}")
+    print(f"\nFound DLLs at:")
+    for dll in dll_files_paths:
+        print(dll)
 
+    user_input = input("\nDo you want to run the program? and update DLLs (y/n): ")
+    if user_input == "y":
+        pass
+    else:
+        exit_program()
     # print(f"Check if DLL Zip location provided")
     # Check if DLL Download is needed
     if "DLSS_ZIP_NAME" in CONFIG:
@@ -200,9 +207,9 @@ if __name__ == "__main__":
         DLSS_FG_ZIP_Name = CONFIG["DLSS_FG_ZIP_Name"]
     else:
         DLSS_FG_ZIP_Name = ""
-    
+
     # Download DLSS zip if not present
-    if not check_if_zip_exists(DLSS_ZIP_Name) and is_empty_or_whitespace(DLSS_ZIP_Name) :
+    if not check_if_zip_exists(DLSS_ZIP_Name) and is_empty_or_whitespace(DLSS_ZIP_Name):
         url = DLSS_URL
         id, file_name = get_file_id(url)
         DLSS_ZIP_Name = download_dll_zip(url, id, file_name)
