@@ -10,7 +10,7 @@ import re
 
 
 def exit_program():
-    print("Press any key to exit...")
+    print("\nPress Enter key to exit...")
     input()
     exit()
 
@@ -49,8 +49,9 @@ try:
         print("GAME_PATH is missing in config.txt")
         exit_program()
 except Exception as e:
-    print("Necessary variable missing from config.txt")
-    print("Necessary variable in config.txt \nTPU_DOWNLOAD_SERVER_ID\nDLSS_URL\nDLSS_FG_URL\nGAME_PATH")
+    print("Necessary variable missing from config.txt\n")
+    print("Check if these variable are in config.txt \n\n\nTPU_DOWNLOAD_SERVER_ID\nDLSS_URL\nDLSS_FG_URL\nGAME_PATH")
+    print("\n\nRefer to Running the program section at https://github.com/MSalman5230/Nvidia_DLSS_DLL_Updater for more information")
     exit_program()
 
 """if "TPU_DOWNLOAD_SERVER_ID" in CONFIG and CONFIG["TPU_DOWNLOAD_SERVER_ID"].strip():
